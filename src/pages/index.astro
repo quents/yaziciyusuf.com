@@ -1,0 +1,88 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+
+// Read about data
+const aboutFiles = import.meta.glob('../content/about.md', { eager: true });
+const about = Object.values(aboutFiles)[0] as any;
+const { name, title, bio, github, linkedin, email, skills } = about.frontmatter;
+
+// Recent blog posts
+const allPosts = await getCollection('blog', ({ data }) => !data.draft);
+const posts = allPosts
+  .sort((a, b) => new Date(b.data.date).getTime() - new Date(a.data.date).getTime())
+  .slice(0, 3);
+
+// Recent bookmarks
+const allBookmarks = await getCollection('bookmarks');
+const bookmarks = allBookmarks.slice(0, 4);
+---
+
+<BaseLayout title={`${name} — ${title}`}>
+  <!-- Hero -->
+  <section class="hero">
+    <div class="container">
+      <span class="hero__label">{title}</span>
+      <h1>Kurumsal çözümler ve <em>AI-native araçlar</em> geliştiriyorum.</h1>
+      <p class="hero__desc">{bio}</p>
+      <div class="hero__links">
+        <a href="/iletisim" class="primary">İletişim</a>
+        <a href={github} target="_blank">GitHub</a>
+        <a href={linkedin} target="_blank">LinkedIn</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- About -->
+  <section class="section">
+    <div class="container">
+      <p class="section__label">Yetenekler</p>
+      <div class="skills">
+        {skills.map((s: string) => <span>{s}</span>)}
+      </div>
+    </div>
+  </section>
+
+  <!-- Recent Posts -->
+  <section class="section">
+    <div class="container">
+      <p class="section__label">Son Yazılar</p>
+      {posts.length > 0 ? (
+        <div class="post-list">
+          {posts.map((post) => (
+            <a href={`/blog/${post.id.replace(/\.mdx?$/, '')}`} class="post-item">
+              <p class="post-item__date">
+                {new Date(post.data.date).toLocaleDateString('tr-TR', { year: 'numeric', month: 'long', day: 'numeric' })}
+              </p>
+              <h3 class="post-item__title">{post.data.title}</h3>
+              <p class="post-item__excerpt">{post.data.excerpt}</p>
+            </a>
+          ))}
+        </div>
+      ) : (
+        <p style="color:var(--text-3);">Henüz yazı yok.</p>
+      )}
+    </div>
+  </section>
+
+  <!-- Recent Bookmarks -->
+  <section class="section">
+    <div class="container">
+      <p class="section__label">Bookmarks</p>
+      <div class="bookmarks-grid">
+        {bookmarks.map((bm) => (
+          <div class="bookmark-card">
+            <div class="bookmark-card__header">
+              <span class="bookmark-card__icon">{bm.data.icon || '📌'}</span>
+              <span class="bookmark-card__title">
+                {bm.data.url ? <a href={bm.data.url} target="_blank">{bm.data.title}</a> : bm.data.title}
+              </span>
+            </div>
+            <p class="bookmark-card__cat">{bm.data.category}</p>
+          </div>
+        ))}
+      </div>
+      <a href="/bookmarks" style="display:inline-block;margin-top:1rem;font-size:0.88rem;">Tüm bookmarks →</a>
+    </div>
+  </section>
+</BaseLayout>

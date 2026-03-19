@@ -1,0 +1,56 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getCollection, render } from 'astro:content';
+
+const allBookmarks = await getCollection('bookmarks');
+const categories = [...new Set(allBookmarks.map((b) => b.data.category))].sort();
+
+// Group by category
+const grouped = categories.map((cat) => ({
+  category: cat,
+  items: allBookmarks.filter((b) => b.data.category === cat),
+}));
+
+// Render body for each bookmark
+const bookmarksWithContent = await Promise.all(
+  allBookmarks.map(async (bm) => {
+    const { Content } = await render(bm);
+    return { ...bm, Content };
+  })
+);
+---
+
+<BaseLayout title="Bookmarks — Yusuf Yazıcı">
+  <section class="section" style="border:none;padding-top:2.5rem;">
+    <div class="container">
+      <h1 style="margin-bottom:0.5rem;">Bookmarks</h1>
+      <p style="color:var(--text-2);margin-bottom:2rem;font-size:0.95rem;">Kullandığım ve sevdiğim araçlar, uygulamalar ve kaynaklar.</p>
+
+      {grouped.map((group) => (
+        <div style="margin-bottom:2.5rem;">
+          <p class="section__label">{group.category}</p>
+          <div class="bookmarks-grid">
+            {group.items.map((bm) => {
+              const withContent = bookmarksWithContent.find((b) => b.id === bm.id);
+              return (
+                <div class="bookmark-card">
+                  <div class="bookmark-card__header">
+                    <span class="bookmark-card__icon">{bm.data.icon || '📌'}</span>
+                    <span class="bookmark-card__title">
+                      {bm.data.url ? <a href={bm.data.url} target="_blank">{bm.data.title}</a> : bm.data.title}
+                    </span>
+                  </div>
+                  {withContent && (
+                    <div class="bookmark-card__desc">
+                      <withContent.Content />
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      ))}
+    </div>
+  </section>
+</BaseLayout>

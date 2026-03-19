@@ -1,0 +1,51 @@
+backend:
+  name: github
+  repo: quents/yaziciyusuf.com
+  branch: main
+
+media_folder: "public/uploads"
+public_folder: "/uploads"
+
+collections:
+  - name: "blog"
+    label: "Blog Yazıları"
+    folder: "src/content/blog"
+    create: true
+    slug: "{{slug}}"
+    fields:
+      - { label: "Başlık", name: "title", widget: "string" }
+      - { label: "Tarih", name: "date", widget: "datetime", format: "YYYY-MM-DD" }
+      - { label: "Özet", name: "excerpt", widget: "text" }
+      - { label: "Etiketler", name: "tags", widget: "list", required: false }
+      - { label: "Taslak", name: "draft", widget: "boolean", default: false, required: false }
+      - { label: "İçerik", name: "body", widget: "markdown" }
+
+  - name: "bookmarks"
+    label: "Bookmarks"
+    folder: "src/content/bookmarks"
+    create: true
+    slug: "{{slug}}"
+    fields:
+      - { label: "İsim", name: "title", widget: "string" }
+      - { label: "Kategori", name: "category", widget: "select", options: ["Mac Uygulamaları", "Web Araçları", "CLI Araçları", "AI Araçları", "Kaynaklar", "Diğer"] }
+      - { label: "URL", name: "url", widget: "string", required: false }
+      - { label: "İkon/Emoji", name: "icon", widget: "string", required: false }
+      - { label: "Tarih", name: "date", widget: "datetime", format: "YYYY-MM-DD", required: false }
+      - { label: "Açıklama", name: "body", widget: "markdown" }
+
+  - name: "pages"
+    label: "Sayfalar"
+    files:
+      - label: "Hakkımda"
+        name: "about"
+        file: "src/content/about.md"
+        fields:
+          - { label: "İsim", name: "name", widget: "string" }
+          - { label: "Ünvan", name: "title", widget: "string" }
+          - { label: "Bio", name: "bio", widget: "text" }
+          - { label: "Şirket", name: "company", widget: "string" }
+          - { label: "GitHub", name: "github", widget: "string" }
+          - { label: "LinkedIn", name: "linkedin", widget: "string" }
+          - { label: "Email", name: "email", widget: "string" }
+          - { label: "Yetenekler", name: "skills", widget: "list" }
+          - { label: "Detaylı Bio", name: "body", widget: "markdown" }
